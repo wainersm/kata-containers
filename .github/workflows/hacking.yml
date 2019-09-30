@@ -17,8 +17,10 @@ jobs:
         #sudo apt-get install -y curl git
         echo "still?"
         # for test development:
-        git clone https://github.com/egernst/packaging-1
-        cd packaging-1/release
+        go get github.com/egernst/packaging-1
+        cd $GOPATH/src/github.com/egernst/packaging-1/release
+        #git clone https://github.com/egernst/packaging-1
+        #cd packaging-1/release
 
         tag=`echo $GITHUB_REF | cut -d/ -f3-`
         echo `pwd`
