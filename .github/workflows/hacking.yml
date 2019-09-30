@@ -18,15 +18,9 @@ jobs:
         echo "still?"
         # for test development:
         echo "go path:" 
-        echo $GOPATH
-        echo $(env)
-        echo $(which go)
-        #go get github.com/egernst/packaging-1
+        export GOPATH=$HOME/go
+        go get github.com/egernst/packaging-1 || true
         cd $GOPATH/src/github.com/egernst/packaging-1/release
-        mkdir $GOPATH/src/github.com/egernst
-        cd $GOPATH/src/github.com/egernst
-        git clone https://github.com/egernst/packaging-1
-        cd packaging-1/release
 
         tag=`echo $GITHUB_REF | cut -d/ -f3-`
         echo `pwd`
