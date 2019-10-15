@@ -1,8 +1,15 @@
-on: push
+#on: push
 
 jobs:
+  get-artifact-list:
+    runs-on: ubuntu-latest
+    steps:
   one:
     runs-on: ubuntu-16.04
+    needs: get-artifact-list
+      - name: get-list
+         run: |
+         echo ::set-env name=build_image::true;
     steps:
       - name: Dump GitHub context
         env:
