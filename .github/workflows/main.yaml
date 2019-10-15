@@ -1,37 +1,35 @@
-#on: push
+on: push
 
 jobs:
   get-artifact-list:
     runs-on: ubuntu-latest
     steps:
+      - name: get the list
+        run: |
+         build_image="bar"
+         echo "the build image: ${build_image}" 
+         echo "foobar" > artifact-list.txt
+         cat artifact-list.txt
+      - name: dump my global variable
+        uses: actions/upload-artifact@master
+        with: 
+          name: artifact-list 
+          path: artifact-list.txt
   one:
     runs-on: ubuntu-16.04
     needs: get-artifact-list
-      - name: get-list
-         run: |
-         echo ::set-env name=build_image::true;
     steps:
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      - name: Dump job context
-        env:
-          JOB_CONTEXT: ${{ toJson(job) }}
-        run: echo "$JOB_CONTEXT"
-      - name: Dump steps context
-        env:
-          STEPS_CONTEXT: ${{ toJson(steps) }}
-        run: echo "$STEPS_CONTEXT"
-      - name: Dump runner context
-        env:
-          RUNNER_CONTEXT: ${{ toJson(runner) }}
-        run: echo "$RUNNER_CONTEXT"
-      - name: Dump strategy context
-        env:
-          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
-        run: echo "$STRATEGY_CONTEXT"
-      - name: Dump matrix context
-        env:
-          MATRIX_CONTEXT: ${{ toJson(matrix) }}
-        run: echo "$MATRIX_CONTEXT"
+      - name: get my global variable
+        uses: actions/download-artifact@master
+        with:
+          name: artifact-list
+      - name: oooooh god please work
+        run: |
+         value=$(cat artifact-list/artifact-list.txt)
+         echo "::set-env name=build_image::$value"
+         echo "$build_image"
+      - name: predicated-attempt
+        if: $build_image == "foobar"
+        run: |
+                echo "my variable: $build_image"
+
