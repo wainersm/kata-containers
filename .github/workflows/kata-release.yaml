@@ -1,0 +1,19 @@
+
+# When a release page is published, start the release artifact process
+on:
+ push:
+  tags:
+  - '*'
+name: Build, Test, and Publish kata-deploy
+
+jobs:
+  # This first stage will return a list of kata-artifacts which 
+  # should be built as parallel jobs
+  get-artifact-list:
+    runs-on: ubuntu-latest
+    steps:
+    - name: get-list
+      run: |
+              git clone https://github.com/amshinde/kata-packing
+              cd kata-packaging/release
+              bash ./build-artifcats.sh --list $tag

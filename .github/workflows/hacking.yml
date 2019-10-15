@@ -10,7 +10,7 @@ jobs:
   publish-artifacts:
     runs-on: ubuntu-latest
     steps:
-    - name : the ok ok 
+    - name : build-artifacts
       run: |  
         echo "hello worold"
         sudo apt-get update
@@ -22,6 +22,7 @@ jobs:
         go get github.com/egernst/packaging-1 || true
         cd $GOPATH/src/github.com/egernst/packaging-1/release
 
+        # grab tag:
         tag=`echo $GITHUB_REF | cut -d/ -f3-`
         echo `pwd`
         echo `ls`
