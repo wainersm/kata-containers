@@ -1,10 +1,14 @@
 
 # When a release page is published, start the release artifact process
-on:
- push:
-  tags:
-  - '*'
+on: push
+
 name: Build, Test, and Publish kata-deploy
+
+env:
+  build_image=false
+  build_kata_components=false
+  build_kernel_experimental=false
+  build_kernel=false
 
 jobs:
   # This first stage will return a list of kata-artifacts which 
@@ -14,6 +18,27 @@ jobs:
     steps:
     - name: get-list
       run: |
-              git clone https://github.com/amshinde/kata-packing
-              cd kata-packaging/release
-              bash ./build-artifcats.sh --list $tag
+        echo ::set-env name=build_image::true;
+
+              
+    - name: set-workflow-vars
+      
+  build_image:
+    needs: get-artifact-list
+    if: build_image
+    runs-on: ubuntu-latest
+    steps:
+    - name: run-build-image
+      run: | 
+         echo "called build image"
+
+  build_kata_components:
+    needs: get-artifact-list
+    if: build_kata_components
+    runs-on: ubuntu-latest
+    steps:
+    - name: run-build-kata-components
+      run: | 
+         echo "called build kata components
+
+    
