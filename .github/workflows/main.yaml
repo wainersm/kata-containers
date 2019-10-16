@@ -116,14 +116,17 @@ jobs:
           go get github.com/amshinde/kata-packaging || true
           pushd $GOPATH/src/github.com/amshinde/kata-packaging/release >>/dev/null
           # Get versions information
-          tag=`echo $GITHUB_REF | cut -d/ -f3-`
+          #tag=`echo $GITHUB_REF | cut -d/ -f3-`
           popd >>/dev/null
+          tag="1.9.0-rc0"
           tarball_name="kata-static-$tag-x86_64.tar.xz"
           pushd kata-artifacts >>/dev/null 
           for c in `ls` do; 
                 echo "untarring tarball $c"
                 tar -xvf $c
           done
-          tar cfJ "${tarball_name}" "./opt"
+          ls ./opt/kata/bin
+          ls ./opt/kata/share
+          tar cfJ "../${tarball_name}" "./opt"
           popd >>/dev/null
           ls -l && ls kata-artifacts
