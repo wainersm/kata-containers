@@ -37,7 +37,7 @@ jobs:
            sudo apt-get update && sudo apt install -y flex bison libelf-dev bc iptables
            export GOPATH=$HOME/go
            go get github.com/amshinde/kata-packaging || true
-           cd $GOPATH/src/github.com/amshinde/kata-packaging/release
+           pushd $GOPATH/src/github.com/amshinde/kata-packaging/release >>/dev/null
            # Get versions information
            tag=`echo $GITHUB_REF | cut -d/ -f3-`
            ../obs-packaging/gen_versions_txt.sh $tag
@@ -45,6 +45,8 @@ jobs:
            source ./kata-deploy-binaries.sh
            install_kernel
            echo ::set-env name=artifact-built::true
+           popd >>/dev/null
+           mv $GOPATH/src/github.com/amshinde/kata-packaging/release/kernel.tar.gz .
          else
            echo ::set-env name=artifact-built::false
          fi
@@ -53,7 +55,7 @@ jobs:
         uses: actions/upload-artifact@master
         with: 
           name: kata-artifacts
-          path: install-kernel.gz
+          path: kernel.tar.gz
 
   # Job for building the QEMU binaries
   build-qemu:
@@ -74,7 +76,7 @@ jobs:
          if [ "$value" == "$predicated_value" ]; then  
            export GOPATH=$HOME/go
            go get github.com/amshinde/kata-packaging || true
-           cd $GOPATH/src/github.com/amshinde/kata-packaging/release
+           pushd $GOPATH/src/github.com/amshinde/kata-packaging/release >>/dev/null
            # Get versions information
            tag=`echo $GITHUB_REF | cut -d/ -f3-`
            ../obs-packaging/gen_versions_txt.sh $tag
@@ -82,6 +84,8 @@ jobs:
            source ./kata-deploy-binaries.sh
            install_qemu
            echo ::set-env name=artifact-built::true
+           popd >>/dev/null
+           mv $GOPATH/src/github.com/amshinde/kata-packaging/release/kata-qemu-static.tar.gz .
          else
            echo ::set-env name=artifact-built::false
          fi
