@@ -51,7 +51,7 @@ jobs:
            echo ::set-env name=artifact-built::true
            popd >>/dev/null
            echo "Changed into top dir" $(pwd)
-           mv $GOPATH/src/github.com/amshinde/kata-packaging/release/kernel.tar.gz .
+           mv $HOME/go/src/github.com/amshinde/kata-packaging/release/kata-kernel.tar.gz .
          else
            echo ::set-env name=artifact-built::false
          fi
@@ -60,7 +60,7 @@ jobs:
         uses: actions/upload-artifact@master
         with: 
           name: kata-artifacts
-          path: kernel.tar.gz
+          path: kata-kernel.tar.gz
 
   # Job for building the QEMU binaries
   build-qemu:
@@ -90,7 +90,8 @@ jobs:
            install_qemu
            echo ::set-env name=artifact-built::true
            popd >>/dev/null
-           mv $GOPATH/src/github.com/amshinde/kata-packaging/release/kata-qemu-static.tar.gz .
+           echo "final GOPATH" $GOPATH
+           mv $HOME/go/src/github.com/amshinde/kata-packaging/release/kata-qemu-static.tar.gz .
          else
            echo ::set-env name=artifact-built::false
          fi
