@@ -7,11 +7,9 @@ jobs:
       - name: get the list
         run: |
          git clone https://github.com/amshinde/kata-packaging
-         ./kata-packaging/release/buid-artifacts.sh > artifact-list.txt
-        #export GOPATH=$HOME/go
-        #         go get github.com/amshinde/kata-packaging || true
-        # cd $GOPATH/src/github.com/amshinde/kata-packaging/release
          echo $PWD
+         ls
+         ./kata-packaging/release/build-artifacts.sh > artifact-list.txt
          cat artifact-list.txt 
       - name: save-artifact-list
         uses: actions/upload-artifact@master
