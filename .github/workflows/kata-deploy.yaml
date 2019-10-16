@@ -19,8 +19,9 @@ jobs:
           echo ::set-env name=PKG_SHA::$pkg_sha
       - name: test-kata-deploy-ci-in-aks
         uses: ./kata-packaging/kata-deploy/action
+        with:
+          packaging-sha: $pkg_sha
         env:
-          PKG_SHA: env.PKG_SHA
           AZ_APPID: ${{ secrets.AZ_APPID }}
           AZ_PASSWORD: ${{ secrets.AZ_PASSWORD }}
           AZ_SUBSCRIPTION_ID: ${{ secrets.AZ_SUBSCRIPTION_ID }}
