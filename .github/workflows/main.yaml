@@ -6,12 +6,14 @@ jobs:
     steps:
       - name: get the list
         run: |
-         export GOPATH=$HOME/go
-         go get github.com/amshinde/kata-packaging || true
-         cd $GOPATH/src/github.com/amshinde/kata-packaging/release
-         ./build-artifacts.sh > artifact-list.txt
+         git clone https://github.com/amshinde/kata-packaging
+         ./kata-packaging/release/buid-artifacts.sh > artifact-list.txt
+        #export GOPATH=$HOME/go
+        #         go get github.com/amshinde/kata-packaging || true
+        # cd $GOPATH/src/github.com/amshinde/kata-packaging/release
+         echo $PWD
          cat artifact-list.txt 
-      - name: dump my global variable
+      - name: save-artifact-list
         uses: actions/upload-artifact@master
         with: 
           name: artifact-list 
