@@ -1,4 +1,4 @@
-#on: push
+on: push
 
 jobs:
   get-artifact-list:
@@ -31,6 +31,7 @@ jobs:
          value=$(cat artifact-list/artifact-list.txt | grep $predicated_value)
          cat artifact-list/artifact-list.txt
          echo $value
+         echo "top dir" $(pwd)
          # Do we want to do some grep on prior 3 lines?
          if [ "$value" == "$predicated_value" ]; then
            # install kernel dependencies
@@ -38,14 +39,18 @@ jobs:
            export GOPATH=$HOME/go
            go get github.com/amshinde/kata-packaging || true
            pushd $GOPATH/src/github.com/amshinde/kata-packaging/release >>/dev/null
+           echo "Current dir " $(pwd)
            # Get versions information
            tag=`echo $GITHUB_REF | cut -d/ -f3-`
            ../obs-packaging/gen_versions_txt.sh $tag
            # Build the kernel:
            source ./kata-deploy-binaries.sh
            install_kernel
+           echo "Current dir after build" $(pwd)
+           echo "Contents of dir after build" $(ls -la)
            echo ::set-env name=artifact-built::true
            popd >>/dev/null
+           echo "Changed into top dir" $(pwd)
            mv $GOPATH/src/github.com/amshinde/kata-packaging/release/kernel.tar.gz .
          else
            echo ::set-env name=artifact-built::false
