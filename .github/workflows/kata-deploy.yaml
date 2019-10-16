@@ -14,3 +14,10 @@ jobs:
           docker build --build-arg KATA_ARTIFACTS=kata-static.tar.xz -t katadocker/kata-deploy-ci:${{ github.sha }} ./kata-packaging/kata-deploy
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker push katadocker/kata-deploy-ci:${{ github.sha }}
+      - name: test-kata-deploy-ci-in-aks
+        uses: ./kata-packaging/kata-deploy/action
+        env: 
+          AZ_APPID: ${{ secrets.AZ_APPID }}
+          AZ_PASSWORD: ${{ secrets.AZ_PASSWORD }}
+          AZ_SUBSCRIPTION_ID: ${{ secrets.AZ_SUBSCRIPTION_ID }}
+          AZ_TENANT_ID: ${{ secrets.AZ_TENANT_ID }}
