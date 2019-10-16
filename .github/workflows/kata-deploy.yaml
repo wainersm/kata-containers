@@ -21,7 +21,7 @@ jobs:
         uses: ./kata-packaging/kata-deploy/action
         with:
           packaging-sha: $pkg_sha
-        env:
+        env: 
           PKG_SHA: $pkg_sha
           AZ_APPID: ${{ secrets.AZ_APPID }}
           AZ_PASSWORD: ${{ secrets.AZ_PASSWORD }}
