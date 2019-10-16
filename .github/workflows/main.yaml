@@ -42,7 +42,7 @@ jobs:
            tag=`echo $GITHUB_REF | cut -d/ -f3-`
            ../obs-packaging/gen_versions_txt.sh $tag
            # Build the kernel:
-           source ./build-artifacts.sh
+           source ./kata-deploy-binaries.sh
            install_kernel
            echo ::set-env name=artifact-built::true
          else
