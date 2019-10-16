@@ -106,5 +106,18 @@ jobs:
       - name: colate-artifacts
         run: |
           ls -la
-          cd kata-artifacts
-          for c in `ls` do; echo $c; done
+          export GOPATH=$HOME/go
+          go get github.com/amshinde/kata-packaging || true
+          pushd $GOPATH/src/github.com/amshinde/kata-packaging/release >>/dev/null
+          # Get versions information
+          tag=`echo $GITHUB_REF | cut -d/ -f3-`
+          popd >>/dev/null
+          tarball_name="kata-static-$tag-x86_64.tar.xz"
+          pushd kata-artifacts >>/dev/null 
+          for c in `ls` do; 
+                echo "untarring tarball $c"
+                tar -xvf $c
+          done
+          tar cfJ "${tarball_name}" "./opt"
+          popd >>/dev/null
+          ls -l && ls kata-artifacts
