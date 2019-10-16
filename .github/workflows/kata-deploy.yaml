@@ -7,7 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: get-kata-deploy-dockerfile-env
-         git clone https://github.com/amshinde/kata-packaging
+        run: |
+          git clone https://github.com/amshinde/kata-packaging
       - name: build-kata-deploy-for-test
         uses: actions/docker/cli@master
         with:
