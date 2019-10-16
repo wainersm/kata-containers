@@ -11,8 +11,7 @@ jobs:
       - name: build-kata-deploy-for-test
         uses: actions/docker/cli@master
         with:
-          args: build --build-arg KATA_VER=1.9.0-rc0 -t katadocker/kata-deploy-ci:${{
-          github.sha }} ./kata-packaging/kata-deploy
+          args: build --build-arg KATA_VER=1.9.0-rc0 -t katadocker/kata-deploy-ci:${{ github.sha }} ./kata-packaging/kata-deploy
       - name: docker-login
         uses: actions/docker/login@master
         env:
