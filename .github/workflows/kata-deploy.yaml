@@ -6,19 +6,9 @@ jobs:
   kata-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: get-kata-deploy-dockerfile-env
+      - name: build-and-push-kata-deploy-ci
         run: |
           git clone https://github.com/amshinde/kata-packaging
-      - name: build-kata-deploy-for-test
-        uses: actions/docker/cli@master
-        with:
-          args: build --build-arg KATA_VER=1.9.0-rc0 -t katadocker/kata-deploy-ci:${{ github.sha }} ./kata-packaging/kata-deploy
-      - name: docker-login
-        uses: actions/docker/login@master
-        env:
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      - name: docker-push-kata-deploy-ci
-        uses: actions/docker/cli@master
-        with:
-          args: push katadocker/kata-deploy-ci:${{ github.sha }}
+          docker build --build-arg KATA_VER=1.9.0-rc0 -t katadocker/kata-deploy-ci:${{ github.sha }} ./kata-packaging/kata-deploy
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker push katadocker/kata-deploy-ci:${{ github.sha }}
