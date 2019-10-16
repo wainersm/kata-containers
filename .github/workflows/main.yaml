@@ -105,5 +105,6 @@ jobs:
           name: kata-artifacts
       - name: colate-artifacts
         run: |
+          ls -la
           cd kata-artifacts
           for c in `ls` do; echo $c; done
