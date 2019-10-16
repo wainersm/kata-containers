@@ -34,7 +34,7 @@ jobs:
          # Do we want to do some grep on prior 3 lines?
          if [ "$value" == "$predicated_value" ]; then
            # install kernel dependencies
-           sudo apt-get update && sudo apt install -y flex bison libelf-dev bc libcrypto iptables
+           sudo apt-get update && sudo apt install -y flex bison libelf-dev bc iptables
            export GOPATH=$HOME/go
            go get github.com/amshinde/kata-packaging || true
            cd $GOPATH/src/github.com/amshinde/kata-packaging/release
