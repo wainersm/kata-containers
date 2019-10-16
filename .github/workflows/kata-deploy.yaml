@@ -15,7 +15,8 @@ jobs:
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker push katadocker/kata-deploy-ci:${{ github.sha }}
           cd kata-packaging
-          echo ::set-env name=PKG_SHA::${{git rev-parse HEAD}} 
+          pkg_sha=$(git rev-parse HEAD)
+          echo ::set-env name=PKG_SHA::$pkg_sha
       - name: test-kata-deploy-ci-in-aks
         uses: ./kata-packaging/kata-deploy/action
         env:
