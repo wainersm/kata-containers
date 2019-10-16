@@ -1,4 +1,4 @@
-on: push
+on: tags
 
 jobs:
   get-artifact-list:
