@@ -6,30 +6,87 @@ jobs:
     steps:
       - name: get the list
         run: |
-         build_image="bar"
-         echo "the build image: ${build_image}" 
-         echo "foobar" > artifact-list.txt
-         cat artifact-list.txt
+         export GOPATH=$HOME/go
+         go get github.com/amshinde/kata-packaging || true
+         cd $GOPATH/src/github.com/amshinde/kata-packaging/release
+         ./build-artifacts.sh > artifact-list.txt
+         cat artifact-list.txt 
       - name: dump my global variable
         uses: actions/upload-artifact@master
         with: 
           name: artifact-list 
           path: artifact-list.txt
-  one:
+  build-kernel:
     runs-on: ubuntu-16.04
     needs: get-artifact-list
     steps:
-      - name: get my global variable
+      - name: get-artifact-list
         uses: actions/download-artifact@master
         with:
           name: artifact-list
-      - name: oooooh god please work
+      - name: build-kernel
         run: |
-         value=$(cat artifact-list/artifact-list.txt)
-         echo "::set-env name=build_image::$value"
-         echo "$build_image"
-      - name: predicated-attempt
-        if: $build_image == "foobar"
+         predicated_value="install_kernel"
+         value=$(cat artifact-list/artifact-list.txt | grep $predicated_value)
+         # Do we want to do some grep on prior 3 lines?
+         if [$value == $predicated_value"] then
+           # install kernel dependencies
+           sudo apt-get update && sudo apt install -y flex bison libelf-dev
+           export GOPATH=$HOME/go
+           go get github.com/amshinde/kata-packaging || true
+           cd $GOPATH/src/github.com/amshinde/kata-packaging/release
+           # Get versions information
+           tag=`echo $GITHUB_REF | cut -d/ -f3-`
+           ../obs-packaging/gen_versions_txt.sh $tag
+           # Build the kernel:
+           source ./build-artifacts.sh
+           install_kernel
+         fi
+      - name: store-artifacts
+        uses: actions/upload-artifact@master
+        with: 
+          name: kata-artifacts
+          path: install-kernel.gz
+  # Job for building the QEMU binaries
+  build-qemu:
+    runs-on: ubuntu-16.04
+    needs: get-artifact-list
+    steps:
+      - name: get-artifact-list
+        uses: actions/download-artifact@master
+        with:
+          name: artifact-list
+      - name: build-qemu
         run: |
-                echo "my variable: $build_image"
+         predicate_value="install_qemu"
+         value=$(cat artifact-list/artifact-list.txt | grep $predicate_value)
+         # Do we want to do some grep on prior 3 lines?
+         if [$value == $predicate_value] then
+           export GOPATH=$HOME/go
+           go get github.com/amshinde/kata-packaging || true
+           cd $GOPATH/src/github.com/amshinde/kata-packaging/release
+           # Get versions information
+           tag=`echo $GITHUB_REF | cut -d/ -f3-`
+           ../obs-packaging/gen_versions_txt.sh $tag
+           # Build the VMM:
+           source ./kata-deploy-binaries.sh
+           install_qemu
+         fi
+      - name: store-artifacts
+        uses: actions/upload-artifact@master
+        with: 
+          name: kata-artifacts
+          path: kata-qemu-static.tar.gz
+  gather-artifacts:
+    runs-on: ubuntu-16.04
+    needs: build-kernel
+    steps:
+      - name: get-artifacts
+        uses: actions/download-artifact@master
+        with:
+          name: kata-artifacts
+      - name: colate-artifacts
+        run: |
+          cd kata-artifacts
+          for c in `ls` do; echo $c; done
 
