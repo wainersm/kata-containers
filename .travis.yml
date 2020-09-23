@@ -47,7 +47,7 @@ before_script:
   - sudo -E PATH=$PATH GOPATH=$GOPATH make -C ${TRAVIS_BUILD_DIR}/src/runtime test
 
 script:
-  - "ci/static-checks.sh"
+  - make check-static
 
 jobs:
   include:

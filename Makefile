@@ -29,4 +29,7 @@ $(eval $(call create_all_rules,$(COMPONENTS),$(TOOLS),$(STANDARD_TARGETS)))
 generate-protocols:
 	make -C src/agent generate-protocols
 
+check-static:
+	bash -f ci/static-checks.sh
+
 .PHONY: all default
