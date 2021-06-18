@@ -1,6 +1,6 @@
-on: ["pull_request"]
+on: [pull_request, issue_comment]
 
-name: test-kata-deploy
+name: Test kata-deploy
 
 jobs:
   create-and-test-container:
