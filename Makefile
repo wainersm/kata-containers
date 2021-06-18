@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-# List of available components
+# List of available componentss
 COMPONENTS =
 
 COMPONENTS += agent
