@@ -1,0 +1,57 @@
+# This configure jobs to test changes on osbuilder.
+#
+name: osbuilder tests
+
+on:
+  pull_request:
+    types: [opened, edited, reopened]
+    # Only run when osbuilder files changed.
+    paths:
+      - 'tools/osbuilder/**'
+
+jobs:
+  # Jobs for dracut based build.
+  dracut-build:
+    runs-on: ubuntu-latest
+    container: fedora:34
+    strategy:
+      matrix:
+        artifact:
+          - initrd
+          - image
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install needed tools
+        run: |
+          dnf update -y
+          # parted and qemu-img are required for the image builder.
+          dnf install -y "@Development Tools" dracut parted qemu-img
+
+#          export DEBIAN_FRONTEND=noninteractive
+#          apt-get update -y
+#          apt-get install -y dracut build-essential
+      - name: Build ${{ matrix.artifact }} with dracut
+        run: |
+          cd tools/osbuilder
+          make BUILD_METHOD=dracut ${{ matrix.artifact }}
+        env:
+          GOPATH: ${{ runner.workspace }}/kata-containers
+  # Jobs for distro based build.
+  distro-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro:
+          - ubuntu
+          - fedora
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install docker
+        run: |
+          curl -fsSL https://test.docker.com -o test-docker.sh
+          sh test-docker.sh
+      - name: Build ${{ matrix.distro }}
+        run: |
+          cd tools/osbuilder
+          make DISTRO=${{ matrix.distro }} initrd
+
