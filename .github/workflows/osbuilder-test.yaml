@@ -1,0 +1,52 @@
+name: osbuilder tests
+
+on:
+#  push:
+  pull_request:
+    paths:
+      - 'tools/osbuilder/**'
+
+jobs:
+  dracut-build:
+#    runs-on: ubuntu-latest
+    container: fedora:34
+    strategy:
+      matrix:
+        artifact:
+          - initrd
+          - image
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install needed tools
+        run: |
+          dnf update -y
+          # dracut and other needed tools will be installed.
+          dnf install -y "@Development Tools"
+#      - name: Install docker
+#        run: |
+#          curl -fsSL https://test.docker.com -o test-docker.sh
+#          sh test-docker.sh
+#      - name: Install needed tools
+#        run: |
+#          export DEBIAN_FRONTEND=noninteractive
+#          apt-get update
+#          apt-get install -y dracut
+      - name: Build ${{artifact}} with dracut
+        run: |
+          cd tools/osbuilder
+          make BUILD_METHOD=dracut ${{artifact}}
+#          make "${KATA_ASSET}-tarball"
+#          build_dir=$(readlink -f build)
+          # store-artifact does not work with symlink
+#          sudo cp -r --preserve=all "${build_dir}" "kata-build"
+        env:
+#          KATA_ASSET: ${{ matrix.asset }}env:
+          GOPATH: ${{ runner.workspace }}/kata-containers
+
+
+#      - name: store-artifact ${{ matrix.asset }}
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: kata-artifacts
+#          path: kata-build/kata-static-${{ matrix.asset }}.tar.xz
+#          if-no-files-found: error
