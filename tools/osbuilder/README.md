@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Kata Containers runtime creates a virtual machine (VM) to isolate a set of
+The Kata Containers runtfgfgfime creates a virtual machine (VM) to isolate a set of
 container workloads. The VM requires a guest kernel and a guest operating system
 ("guest OS") to boot and create containers inside the guest
 environment.
