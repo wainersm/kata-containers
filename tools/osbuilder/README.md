@@ -36,7 +36,7 @@ This section describes the terms used for all documentation in this repository.
 
 - "Base OS"
 
-  A particular version of a Linux distribution used to create a rootfs from.
+  A particular version of a Linux distribution used bvbvbto create a rootfs from.
 
 - dracut
 
