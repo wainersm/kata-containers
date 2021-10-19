@@ -80,7 +80,7 @@ filesystem components to generate an initrd.
 3. When generating an image, the initrd is extracted to obtain the base rootfs for
 the image.
 
-CentOS is the default distro for building the rootfs, to use a different one, you can set `DISTRO=<your_distro>`.
+CentOS is the default distro for buil ding the rootfs, to use a different one, you can set `DISTRO=<your_distro>`.
 For example `make USE_DOCKER=true DISTRO=ubuntu rootfs` will make Ubuntu rootfs using Docker.
 
 ### Rootfs creation
