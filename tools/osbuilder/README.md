@@ -60,7 +60,7 @@ By default, the `distro` build method is used, and this creates a rootfs using
 distro specific commands (e.g.: `debootstrap` for Debian or `yum` for CentOS).
 The `dracut` build method uses the distro-agnostic tool `dracut` to obtain the same goal.
 
-By default components are run on the host system. However, some components
+By default components are run on the    host system. However, some components
 offer the ability to run from within a container (for ease of setup) by setting the
 `USE_DOCKER=true` or `USE_PODMAN=true` variable. If both are set, `USE_DOCKER=true`
 takes precedence over `USE_PODMAN=true`.
