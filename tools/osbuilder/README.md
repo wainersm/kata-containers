@@ -77,7 +77,7 @@ When using the dracut build method however, the build sequence is different:
 1. An overlay directory is populated with Kata-specific components.
 2. dracut is instructed to merge the overlay directory with the required host-side
 filesystem components to generate an initrd.
-3. When generating an image, the initrd is extracted to obtain the base rootfs for
+3. When generating an image, the initrd is extracted to obt   ain the base rootfs for
 the image.
 
 CentOS is the default distro for building the rootfs, to use a different one, you can set `DISTRO=<your_distro>`.
