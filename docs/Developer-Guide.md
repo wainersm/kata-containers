@@ -714,3 +714,28 @@ time="2020-09-15T14:56:23.105268162+08:00" level=debug msg="reading guest consol
 time="2020-09-15T14:56:23.121121598+08:00" level=debug msg="reading guest console" console-protocol=unix console-url=/run/vc/vm/ab9f633385d4987828d342e47554fc6442445b32039023eeddaa971c1bb56791/console.sock pid=107642 sandbox=ab9f633385d4987828d342e47554fc6442445b32039023eeddaa971c1bb56791 source=virtcontainers subsystem=sandbox vmconsole="[    0.421324] memmap_init_zone_device initialised 32768 pages in 12ms"
 ...
 ```
+
+## Developing for Confidential Containers (CoCo)
+
+<!-- TODO: Create a better introduction and link to the use case document
+     in the docs/use-cases directory.
+-->
+This section provides information on how to develop Kata Container for
+Confidential Containers (CoCo).
+
+> **Note:**
+> The Confidential Containers support in Kata Containers is still a work in
+> progress and in its early development stages. You should not be following
+> the guidelines of this section unless you are involved on CoCo development
+> efforts.
+
+### Build for CoCo
+
+Currently some components of the software stack should be built from branched
+versions. For example, it relies on a [fork of containerd](github.com/confidential-containers/containerd)
+to accommodate requirements for the Kata Agent. Thus, it was introduced the
+`KATA_BUILD_CC` variable to be used by the build scripts to differentiate between
+the "vanilla" and CoCo specific code/build paths.
+
+So if you want to build the Kata Containers for CoCo then you should export the
+`KATA_BUILD_CC=yes` variable in your build environment.
