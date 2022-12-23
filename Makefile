@@ -40,6 +40,7 @@ generate-protocols:
 static-checks: static-checks-build
 	bash ci/static-checks.sh
 
+
 docs-url-alive-check:
 	bash ci/docs-url-alive-check.sh
 
