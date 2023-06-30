@@ -32,7 +32,8 @@ hash_device=${root_device%?}2
 
 if [ -e ${root_device} ] && [ -e ${hash_device} ] && [ "${rootfs_verifier}" = "dm-verity" ]
 then
-    veritysetup open "${root_device}" root "${hash_device}" "${rootfs_hash}"
+    veritysetup open "${root_device}" root "${hash_device}" "${rootfs_hash}" || \
+	    >&2 echo "ERROR: veritysetup failed!"
     mount /dev/mapper/root /mnt
 else
     echo "No LUKS device found"
