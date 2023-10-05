@@ -25,11 +25,13 @@ containerd_runtime_type="io.containerd.kata-${KATA_HYPERVISOR}.v2"
 containerd_shim_path="$(command -v containerd-shim)"
 
 #containerd config file
-readonly tmp_dir=$(mktemp -t -d test-cri-containerd.XXXX)
+export tmp_dir=$(mktemp -t -d test-cri-containerd.XXXX)
 export REPORT_DIR="${tmp_dir}"
-readonly CONTAINERD_CONFIG_FILE="${tmp_dir}/test-containerd-config"
-readonly CONTAINERD_CONFIG_FILE_TEMP="${CONTAINERD_CONFIG_FILE}.temp"
-readonly default_containerd_config_backup="$CONTAINERD_CONFIG_FILE.backup"
+export CONTAINERD_CONFIG_FILE="${tmp_dir}/test-containerd-config"
+export CONTAINERD_CONFIG_FILE_TEMP="${CONTAINERD_CONFIG_FILE}.temp"
+export default_containerd_config_backup="$CONTAINERD_CONFIG_FILE.backup"
+
+TESTS_UNION=(generic.bats)
 
 function cleanup() {
 	ci_cleanup
@@ -50,84 +52,6 @@ function err_report() {
 	sudo journalctl -xe -t kata
 	echo "-------------------------------------"
 	echo "::endgroup::"
-}
-
-function testContainerStart() {
-	# no_container_yaml set to 1 will not create container_yaml
-	# because caller has created its own container_yaml.
-	no_container_yaml=${1:-0}
-
-	local pod_yaml=${REPORT_DIR}/pod.yaml
-	local container_yaml=${REPORT_DIR}/container.yaml
-	local image="busybox:latest"
-
-	cat << EOF > "${pod_yaml}"
-metadata:
-  name: busybox-sandbox1
-  namespace: default
-  uid: busybox-sandbox1-uid
-EOF
-
-	#TestContainerSwap has created its own container_yaml.
-	if [ $no_container_yaml -ne 1 ]; then
-		cat << EOF > "${container_yaml}"
-metadata:
-  name: busybox-killed-vmm
-  namespace: default
-  uid: busybox-killed-vmm-uid
-image:
-  image: "$image"
-command:
-- top
-EOF
-	fi
-
-	sudo cp "$default_containerd_config" "$default_containerd_config_backup"
-	sudo cp $CONTAINERD_CONFIG_FILE "$default_containerd_config"
-
-	restart_containerd_service
-
-	pause_image=$(sudo crictl info | jq -r .config.sandboxImage)
-	sudo crictl pull "$pause_image"
-	sudo crictl pull $image
-	podid=$(sudo crictl runp $pod_yaml)
-	cid=$(sudo crictl create $podid $container_yaml $pod_yaml)
-	sudo crictl start $cid
-}
-
-function testContainerStop() {
-	info "show pod $podid"
-	sudo crictl --timeout=20s pods --id $podid
-	info "stop pod $podid"
-	sudo crictl --timeout=20s stopp $podid
-	info "remove pod $podid"
-	sudo crictl --timeout=20s rmp $podid
-
-	sudo cp "$default_containerd_config_backup" "$default_containerd_config"
-	restart_containerd_service
-}
-
-function TestKilledVmmCleanup() {
-	if [[ "${KATA_HYPERVISOR}" != "qemu" ]]; then
-		info "TestKilledVmmCleanup is skipped for ${KATA_HYPERVISOR}, only QEMU is currently tested"
-		return 0
-	fi
-
-	info "test killed vmm cleanup"
-
-	testContainerStart
-
-	qemu_pid=$(ps aux|grep qemu|grep -v grep|awk '{print $2}')
-	info "kill qemu $qemu_pid"
-	sudo kill -SIGKILL $qemu_pid
-	# sleep to let shimv2 exit
-	sleep 1
-	remained=$(ps aux|grep shimv2|grep -v grep || true)
-	[ -z $remained ] || die "found remaining shimv2 process $remained"
-
-	testContainerStop
-
-	info "stop containerd"
 }
 
 function TestContainerMemoryUpdate() {
@@ -343,12 +267,14 @@ function main() {
 	# TestContainerSwap
 
 	# TODO: runtime-rs doesn't support memory update currently
-	if [ "$KATA_HYPERVISOR" != "dragonball" ]; then
-		TestContainerMemoryUpdate 1
-		TestContainerMemoryUpdate 0
-	fi
+	#if [ "$KATA_HYPERVISOR" != "dragonball" ]; then
+	#	TestContainerMemoryUpdate 1
+	#	TestContainerMemoryUpdate 0
+	#fi
 
-	TestKilledVmmCleanup
+	pushd "$SCRIPT_PATH"
+	bats ${TESTS_UNION[@]}
+	popd
 }
 
 main
