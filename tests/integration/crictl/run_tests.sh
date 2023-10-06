@@ -18,7 +18,7 @@ source "${SCRIPT_PATH}/../cri-containerd/lib.sh"
 # golang is installed in /usr/local/go/bin/ add that path
 export PATH="$PATH:/usr/local/go/bin"
 
-ARCH=$(uname -m)
+export ARCH=$(uname -m)
 
 containerd_runtime_type="io.containerd.kata-${KATA_HYPERVISOR}.v2"
 
@@ -31,7 +31,8 @@ export CONTAINERD_CONFIG_FILE="${tmp_dir}/test-containerd-config"
 export CONTAINERD_CONFIG_FILE_TEMP="${CONTAINERD_CONFIG_FILE}.temp"
 export default_containerd_config_backup="$CONTAINERD_CONFIG_FILE.backup"
 
-TESTS_UNION=(generic.bats)
+TESTS_UNION=(generic.bats \
+	container_update.bats)
 
 function cleanup() {
 	ci_cleanup
@@ -52,57 +53,6 @@ function err_report() {
 	sudo journalctl -xe -t kata
 	echo "-------------------------------------"
 	echo "::endgroup::"
-}
-
-function TestContainerMemoryUpdate() {
-	if [[ "${KATA_HYPERVISOR}" != "qemu" ]] || [[ "${ARCH}" == "ppc64le" ]] || [[ "${ARCH}" == "s390x" ]]; then
-		return
-	fi
-
-	test_virtio_mem=$1
-
-	if [ $test_virtio_mem -eq 1 ]; then
-		if [[ "$ARCH" != "x86_64" ]]; then
-			return
-		fi
-		info "Test container memory update with virtio-mem"
-
-		sudo sed -i -e 's/^#enable_virtio_mem.*$/enable_virtio_mem = true/g' "${kata_config}"
-	else
-		info "Test container memory update without virtio-mem"
-
-		sudo sed -i -e 's/^enable_virtio_mem.*$/#enable_virtio_mem = true/g' "${kata_config}"
-	fi
-
-	testContainerStart
-
-	vm_size=$(($(sudo crictl exec $cid cat /proc/meminfo | grep "MemTotal:" | awk '{print $2}')*1024))
-	if [ $vm_size -gt $((2*1024*1024*1024)) ] || [ $vm_size -lt $((2*1024*1024*1024-128*1024*1024)) ]; then
-		testContainerStop
-		die "The VM memory size $vm_size before update is not right"
-	fi
-
-	sudo crictl update --memory $((2*1024*1024*1024)) $cid
-	sleep 1
-
-	vm_size=$(($(sudo crictl exec $cid cat /proc/meminfo | grep "MemTotal:" | awk '{print $2}')*1024))
-	if [ $vm_size -gt $((4*1024*1024*1024)) ] || [ $vm_size -lt $((4*1024*1024*1024-128*1024*1024)) ]; then
-		testContainerStop
-		die "The VM memory size $vm_size after increase is not right"
-	fi
-
-	if [ $test_virtio_mem -eq 1 ]; then
-		sudo crictl update --memory $((1*1024*1024*1024)) $cid
-		sleep 1
-
-		vm_size=$(($(sudo crictl exec $cid cat /proc/meminfo | grep "MemTotal:" | awk '{print $2}')*1024))
-		if [ $vm_size -gt $((3*1024*1024*1024)) ] || [ $vm_size -lt $((3*1024*1024*1024-128*1024*1024)) ]; then
-			testContainerStop
-			die "The VM memory size $vm_size after decrease is not right"
-		fi
-	fi
-
-	testContainerStop
 }
 
 function getContainerSwapInfo() {
@@ -265,12 +215,6 @@ function main() {
 	# Let's re-enable it as soon as we get it to work.
 	# Reference: https://github.com/kata-containers/kata-containers/issues/7410
 	# TestContainerSwap
-
-	# TODO: runtime-rs doesn't support memory update currently
-	#if [ "$KATA_HYPERVISOR" != "dragonball" ]; then
-	#	TestContainerMemoryUpdate 1
-	#	TestContainerMemoryUpdate 0
-	#fi
 
 	pushd "$SCRIPT_PATH"
 	bats ${TESTS_UNION[@]}
