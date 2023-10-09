@@ -199,23 +199,7 @@ function create_cluster_kcli() {
 
 	export KUBECONFIG="$HOME/.kcli/clusters/$CLUSTER_NAME/auth/kubeconfig"
 
-	local cmd="kubectl get nodes | grep '.*worker.*\<Ready\>'"
-	echo "Wait at least one worker be Ready"
-	if ! waitForProcess "330" "30" "$cmd"; then
-		echo "ERROR: worker nodes not ready."
-		kubectl get nodes
-		return 1
-	fi
-
-	# Ensure that system pods are running or completed.
-	cmd="[ \$(kubectl get pods -A --no-headers | grep -v 'Running\|Completed' | wc -l) -eq 0 ]"
-	echo "Wait system pods be running or completed"
-	if ! waitForProcess "90" "30" "$cmd"; then
-		echo "ERROR: not all pods are Running or Completed."
-		kubectl get pods -A
-		kubectl get pods -A
-		return 1
-	fi
+	wait_cluster_is_ready 330 90
 }
 
 function deploy_rke2() {
@@ -273,4 +257,27 @@ function deploy_k8s() {
 	esac
 
 	echo "::endgroup::"
+}
+
+function wait_cluster_is_ready() {
+	local wait_workers_timeout="${1:-330}"
+	local wait_pods_timeout="${2:-90}"
+
+	local cmd="kubectl get nodes | grep '.*worker.*\<Ready\>'"
+	echo "Wait at least one worker be Ready"
+	if ! waitForProcess "$wait_workers_timeout" "30" "$cmd"; then
+		echo "ERROR: worker nodes not ready."
+		kubectl get nodes
+		return 1
+	fi
+
+	# Ensure that system pods are running or completed.
+	cmd="[ \$(kubectl get pods -A --no-headers | grep -v 'Running\|Completed' | wc -l) -eq 0 ]"
+	echo "Wait system pods be running or completed"
+	if ! waitForProcess "$wait_pods_timeout" "30" "$cmd"; then
+		echo "ERROR: not all pods are Running or Completed."
+		kubectl get pods -A
+		kubectl get pods -A
+		return 1
+	fi
 }
