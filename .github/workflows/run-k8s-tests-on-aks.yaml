@@ -80,7 +80,7 @@ jobs:
         run: bash tests/integration/kubernetes/gha-run.sh install-bats
 
       - name: Install `kubectl`
-        run: bash tests/integration/kubernetes/gha-run.sh install-kubectl
+        run: bash tests/integration/kubernetes/gha-run.sh install-kubectl-aks
 
       - name: Download credentials for the Kubernetes CLI to use them
         run: bash tests/integration/kubernetes/gha-run.sh get-cluster-credentials

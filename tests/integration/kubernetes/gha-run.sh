@@ -241,7 +241,7 @@ function main() {
         setup-crio) setup_crio ;;
         deploy-k8s) deploy_k8s ;;
         install-bats) install_bats ;;
-        install-kubectl) install_kubectl ;;
+        install-kubectl-aks) install_kubectl_aks ;;
         get-cluster-credentials) get_cluster_credentials ;;
         deploy-kata-aks) deploy_kata "aks" ;;
         deploy-kata-kcli) deploy_kata "kcli" ;;

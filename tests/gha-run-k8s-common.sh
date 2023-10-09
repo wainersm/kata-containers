@@ -88,6 +88,26 @@ function install_bats() {
 }
 
 function install_kubectl() {
+    local kubectl_version="$1"
+    local destdir="${2:-/usr/bin/}"
+
+    cmd="$(command -v kubectl)"
+    if [ -n "$cmd" ]; then
+      echo "WARN: kubectl already exist at $cmd. Not gonna install it again."
+      return
+    fi
+
+    local go_arch
+    go_arch="$(uname -m)"
+    if [ "${go_arch}" = "x86_64" ]; then
+        go_arch=amd64
+    fi
+    sudo curl -fL --progress-bar -o "${destdir}/kubectl" \
+       "https://storage.googleapis.com/kubernetes-release/release/${kubectl_version}/bin/linux/${go_arch}/kubectl"
+    sudo chmod +x "${destdir}/kubectl"
+}
+
+function install_kubectl_aks() {
     sudo az aks install-cli
 }
 
@@ -129,13 +149,8 @@ function deploy_k0s() {
 
 	# Download the kubectl binary into /usr/bin so we can avoid depending
 	# on `k0s kubectl` command
-	ARCH=$(uname -m)
-	if [ "${ARCH}" = "x86_64" ]; then
-		ARCH=amd64
-	fi
 	kubectl_version=$(sudo k0s kubectl version 2>/dev/null | grep "Client Version" | sed -e 's/Client Version: //')
-	sudo curl -fL --progress-bar -o /usr/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${kubectl_version}/bin/linux/${ARCH}/kubectl
-	sudo chmod +x /usr/bin/kubectl
+	install_kubectl "$kubectl_version"
 
 	mkdir -p ~/.kube
 	sudo cp /var/lib/k0s/pki/admin.conf ~/.kube/config
@@ -157,13 +172,8 @@ function deploy_k3s() {
 	# Which happens basically because k3s links `/usr/local/bin/kubectl`
 	# to `/usr/local/bin/k3s`, and that does extra stuff that vanilla
 	# `kubectl` doesn't do.
-	ARCH=$(uname -m)
-	if [ "${ARCH}" = "x86_64" ]; then
-		ARCH=amd64
-	fi
 	kubectl_version=$(/usr/local/bin/k3s kubectl version --short 2>/dev/null | grep "Client Version" | sed -e 's/Client Version: //' -e 's/\+k3s1//')
-	sudo curl -fL --progress-bar -o /usr/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${kubectl_version}/bin/linux/${ARCH}/kubectl
-	sudo chmod +x /usr/bin/kubectl
+	install_kubectl "$kubectl_version"
 	sudo rm -rf /usr/local/bin/kubectl
 
 	mkdir -p ~/.kube
