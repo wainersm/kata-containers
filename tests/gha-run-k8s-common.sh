@@ -111,6 +111,22 @@ function install_kubectl_aks() {
     sudo az aks install-cli
 }
 
+function get_cluster_gitVersion() {
+	local kubeconfig="$1"
+	local api_server
+
+	yq -r '.clusters[0].cluster.certificate-authority-data' "$kubeconfig" | base64 -d > ca.crt
+	yq -r '.users[0].user.client-certificate-data' "$kubeconfig" | base64 -d > client.crt
+	yq -r '.users[0].user.client-key-data' "$kubeconfig" | base64 -d > client.key
+	api_server=$(yq -r '.clusters[0].cluster.server' "$kubeconfig")
+
+	curl -s \
+		--cacert ca.crt \
+		--cert client.crt \
+		--key client.key \
+		"${api_server}/version" | jq -r '.gitVersion'
+}
+
 function get_cluster_credentials() {
     test_type="${1:-k8s}"
 
@@ -182,10 +198,13 @@ function deploy_k3s() {
 
 function create_cluster_kcli() {
 	CLUSTER_NAME="${CLUSTER_NAME:-kata-k8s}"
+	KUBE_TYPE="${KUBE_TYPE:-generic}"
+
+	local k8s_version
 
 	delete_cluster_kcli || true
 
-	kcli create kube "${KUBE_TYPE:-generic}" \
+	kcli create kube "$KUBE_TYPE" \
 		-P domain="kata.com" \
 		-P pool="${LIBVIRT_POOL:-default}" \
 		-P ctlplanes="${CLUSTER_CONTROL_NODES:-1}" \
@@ -199,7 +218,12 @@ function create_cluster_kcli() {
 
 	export KUBECONFIG="$HOME/.kcli/clusters/$CLUSTER_NAME/auth/kubeconfig"
 
-	wait_cluster_is_ready 330 90
+	if [ "$KUBE_TYPE" = "generic" ]; then
+		k8s_version=$(get_cluster_gitVersion "$KUBECONFIG")
+		install_kubectl "$k8s_version"
+
+		wait_cluster_is_ready 330 90
+	fi
 }
 
 function deploy_rke2() {
