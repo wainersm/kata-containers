@@ -186,26 +186,16 @@ function deploy_k0s() {
 }
 
 function deploy_k3s() {
-	curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644
-
-	# This is an arbitrary value that came up from local tests
-	sleep 120s
-
-	# Download the kubectl binary into /usr/bin and remove /usr/local/bin/kubectl
-	#
-	# We need to do this to avoid hitting issues like:
-	# ```sh
-	# error: open /etc/rancher/k3s/k3s.yaml.lock: permission denied
-	# ```
-	# Which happens basically because k3s links `/usr/local/bin/kubectl`
-	# to `/usr/local/bin/k3s`, and that does extra stuff that vanilla
-	# `kubectl` doesn't do.
-	kubectl_version=$(/usr/local/bin/k3s kubectl version --short 2>/dev/null | grep "Client Version" | sed -e 's/Client Version: //' -e 's/\+k3s1//')
-	install_kubectl "$kubectl_version"
-	sudo rm -rf /usr/local/bin/kubectl
+	export KUBE_TYPE=k3s
+	create_cluster_kcli
 
 	mkdir -p ~/.kube
-	cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+	cp "$KUBECONFIG" ~/.kube/config
+
+	kubectl_version=$(get_cluster_gitVersion "$KUBECONFIG" | sed -e 's/\+k3s1//')
+	install_kubectl "$kubectl_version"
+
+	wait_cluster_is_ready
 }
 
 function create_cluster_kcli() {
