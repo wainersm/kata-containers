@@ -87,6 +87,18 @@ function install_bats() {
     sudo add-apt-repository --remove 'deb http://archive.ubuntu.com/ubuntu/ lunar universe'
 }
 
+function install_kcli() {
+	cmd=$(command -v kcli)
+	if [ -n "$cmd" ]; then
+		echo "WARN: kcli already exist at $cmd. Not gonna install it again."
+		return
+	fi
+
+	curl -1sLf https://dl.cloudsmith.io/public/karmab/kcli/cfg/setup/bash.deb.sh | sudo -E bash
+	sudo apt-get update
+	sudo apt-get -y install python3-kcli qemu-kvm
+}
+
 function install_kubectl() {
     local kubectl_version="$1"
     local destdir="${2:-/usr/bin/}"
