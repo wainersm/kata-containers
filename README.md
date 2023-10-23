@@ -13,7 +13,7 @@ If you want to learn about Kata Containers, visit the main
 ## Introduction
 
 Kata Containers is an open source project and community working to build a
-standard implementation of lightweight Virtual Machines (VMs) that feel and
+standard implementatiofdfdn of lightweight Virtual Machines (VMs) that feel and
 perform like containers, but provide the workload isolation and security
 advantages of VMs.
 
