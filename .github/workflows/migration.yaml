@@ -1,0 +1,19 @@
+name: Migration to free runners
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run-k8s-tests-on-amd64:
+    uses: ./.github/workflows/run-k8s-tests-on-amd64.yaml
+    with:
+      registry: ghcr.io
+      repo: kata-containers/kata-deploy-ci
+      commit-hash: 2da77c6979f9a30d369e7b474a38484c8e3be39e
+      pr-number: "nightly"
+      tag: 2da77c6979f9a30d369e7b474a38484c8e3be39e-nightly-amd64
+      target-branch: ${{ github.ref_name }}
+    secrets: inherit
