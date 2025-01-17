@@ -1,0 +1,21 @@
+# Copyright (c) 2025 Red Hat
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-terminationmessage-path
+spec:
+  terminationGracePeriodSeconds: 0
+  restartPolicy: Never
+  containers:
+  - name: busybox
+    image: quay.io/prometheus/busybox:latest
+    command:
+    - sh
+    - -cx
+    - echo "My message to /tmp/foo" > /tmp/foo
+    terminationMessagePath: /tmp/foo
+    terminationMessagePolicy: File
+  runtimeClassName: kata
