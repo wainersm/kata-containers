@@ -1,0 +1,17 @@
+---
+name: test changes
+on:
+  workflow_dispatch:
+
+jobs:
+    run-kata-coco-tests:
+        uses: ./.github/workflows/run-kata-coco-tests.yaml
+        with:
+          tarball-suffix: -64ceb0832a156bf1c9be25cde6a7063a6e1b7c7c-nightly
+          registry: ghcr.io
+          repo: kata-containers/kata-deploy-ci
+          tag: 64ceb0832a156bf1c9be25cde6a7063a6e1b7c7c-nightly-amd64
+          commit-hash: ${{ github.sha }}
+          pr-number: "nightly"
+          target-branch: main
+        secrets: inherit
