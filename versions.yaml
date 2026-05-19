@@ -289,6 +289,11 @@ externals:
     url: "https://github.com/containernetworking/plugins"
     version: "v1.2.0"
 
+  crio:
+    description: "OCI-based Kubernetes Container Runtime Interface implementation"
+    url: "https://github.com/cri-o/cri-o"
+    version: "1.32"
+
   coco-guest-components:
     description: "Provides attested key unwrapping for image decryption"
     url: "https://github.com/confidential-containers/guest-components/"
