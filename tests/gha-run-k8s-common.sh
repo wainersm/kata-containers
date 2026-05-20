@@ -240,7 +240,12 @@ function get_nodes_and_pods_info() {
 }
 
 function setup_crio() {
-	crio_version=$(get_from_kata_deps ".externals.crio.version")
+	local k0s_latest_url
+	k0s_latest_url=$(curl -sI -L -o /dev/null -w '%{url_effective}' https://github.com/k0sproject/k0s/releases/latest)
+	local k0s_version=${k0s_latest_url##*/}
+	local crio_version=${k0s_version%.*+*}
+	crio_version=${crio_version#v}
+
 	install_crio "${crio_version}"
 	overwrite_crio_config
 }
