@@ -119,6 +119,25 @@ function create_coco_pod_yaml() {
 	CC_KBS_ADDR=$(kbs_k8s_svc_http_addr)
 	export CC_KBS_ADDR
 
+	if [[ "${COCO_CONFIG_METHOD:-kernel_params}" == "initdata" ]]; then
+		local cdh_section=""
+		if [[ -n "${image_policy}" ]]; then
+			cdh_section+="
+[image]
+image_security_policy_uri = \"${image_policy}\"
+enable_signature_verification = true"
+		fi
+		if [[ -n "${image_registry_auth}" ]]; then
+			cdh_section+="
+[image]
+authenticated_registry_credentials_uri = \"${image_registry_auth}\""
+		fi
+		local initdata
+		initdata=$(get_initdata_with_cdh_image_section "${cdh_section}")
+		create_coco_pod_yaml_with_annotations "${image}" "" "${initdata}" "${node}"
+		return
+	fi
+
 	kernel_params_annotation="io.katacontainers.config.hypervisor.kernel_params"
 	kernel_params_value=""
 
