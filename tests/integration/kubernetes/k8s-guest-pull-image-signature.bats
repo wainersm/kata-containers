@@ -74,6 +74,8 @@ EOF
 }
 
 @test "Create a pod from an unsigned image, on an insecureAcceptAnything registry works" {
+    # downstream-only: skip kernel-param variant, initdata equivalent exists (test 6)
+    skip "Initdata equivalent exists"
     # We want to set the default policy to be reject to rule out false positives
     setup_kbs_image_policy "reject"
 
@@ -88,6 +90,8 @@ EOF
 }
 
 @test "Create a pod from an unsigned image, on a 'restricted registry' is rejected" {
+    # downstream-only: skip kernel-param variant, initdata equivalent exists (test 7)
+    skip "Initdata equivalent exists"
     # We want to leave the default policy to be insecureAcceptAnything to rule out false negatives
     setup_kbs_image_policy
 
@@ -102,6 +106,8 @@ EOF
 }
 
 @test "Create a pod from a signed image, on a 'restricted registry' is successful" {
+    # downstream-only: skip kernel-param variant, initdata equivalent exists (test 8)
+    skip "Initdata equivalent exists"
     # We want to set the default policy to be reject to rule out false positives
     setup_kbs_image_policy "reject"
 
@@ -116,6 +122,8 @@ EOF
 }
 
 @test "Create a pod from a signed image, on a 'restricted registry', but with the wrong key is rejected" {
+    # downstream-only: skip kernel-param variant, initdata equivalent exists (test 9)
+    skip "Initdata equivalent exists"
     # We want to leave the default policy to be insecureAcceptAnything to rule out false negatives
     setup_kbs_image_policy
 
@@ -130,6 +138,8 @@ EOF
 }
 
 @test "Create a pod from an unsigned image, on a 'restricted registry' works if policy files isn't set" {
+    # downstream-only: skip kernel-param variant, initdata equivalent exists (test 10)
+    skip "Initdata equivalent exists"
     # We want to set the default policy to be reject to rule out false positives
     setup_kbs_image_policy "reject"
 

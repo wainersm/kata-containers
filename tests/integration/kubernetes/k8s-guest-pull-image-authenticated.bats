@@ -87,6 +87,8 @@ EOF
 }
 
 @test "Test that creating a container from an authenticated image, with correct credentials works" {
+    # downstream-only: skip kernel-param variant, initdata equivalent exists (test 4)
+    skip "Initdata equivalent exists"
 
     setup_kbs_credentials "${AUTHENTICATED_IMAGE}" ${AUTHENTICATED_IMAGE_USER} ${AUTHENTICATED_IMAGE_PASSWORD}
 
@@ -102,6 +104,8 @@ EOF
 }
 
 @test "Test that creating a container from an authenticated image, with incorrect credentials fails" {
+    # downstream-only: skip kernel-param variant, initdata equivalent exists (test 5)
+    skip "Initdata equivalent exists"
 
     setup_kbs_credentials "${AUTHENTICATED_IMAGE}" ${AUTHENTICATED_IMAGE_USER} "junk"
 
@@ -117,6 +121,8 @@ EOF
 }
 
 @test "Test that creating a container from an authenticated image, with no credentials fails" {
+    # downstream-only: skip kernel-param variant, initdata equivalent exists (test 6)
+    skip "Initdata equivalent exists"
 
     # Create pod config, but don't add agent.image_registry_auth annotation
     create_coco_pod_yaml "${AUTHENTICATED_IMAGE}" "" "" "" "resource" "$node"
